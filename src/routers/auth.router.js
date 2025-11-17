@@ -17,6 +17,9 @@ authRouter.post("/register", registerController);
 authRouter.post("/login", loginController);
 authRouter.post("/change-email", authenticate, changeEmailController);
 authRouter.post("/change-password", authenticate, changePasswordController);
+authRouter.get("/admin", authenticate, authorizeRole("admin"), (req, res) => {
+  res.json({ message: "Hello, admin!" });
+});
 authRouter.delete("/delete-account", authenticate, deleteAccountController);
 authRouter.patch(
   "/update-role",
