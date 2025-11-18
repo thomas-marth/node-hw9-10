@@ -16,7 +16,7 @@ const authenticate = async (req, res, next) => {
     const payload = jwt.verify(token, JWT_SECRET);
     const user = await User.findByPk(payload.id);
     if (!user) throw HttpError(401, "User not found");
-    req.user = { id: user.id, role: user.role, email: user.email };
+    req.user = user;
     next();
   } catch (error) {
     throw HttpError(401, error.message);

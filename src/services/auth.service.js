@@ -8,7 +8,7 @@ const { JWT_SECRET } = process.env;
 export const findUser = (query) => User.findOne(query);
 
 export const register = async ({ email, password, username }) => {
-  const user = await findUser({ email });
+  const user = await findUser({ where: { email } });
   if (user) throw HttpError(409, "Email already in use");
 
   const hashPassword = await bcrypt.hash(password, 10);
@@ -16,7 +16,7 @@ export const register = async ({ email, password, username }) => {
 };
 
 export const login = async ({ email, password }) => {
-  const user = await findUser({ email });
+  const user = await findUser({ where: { email } });
 
   if (!user) throw HttpError(401, "Email or password invalid");
 
@@ -27,7 +27,7 @@ export const login = async ({ email, password }) => {
     throw HttpError(403, "You must change your password before login");
   }
 
-  const token = jwt.sign({ email }, JWT_SECRET, {
+  const token = jwt.sign({ id: user.id }, JWT_SECRET, {
     expiresIn: "24h",
   });
 
@@ -100,8 +100,8 @@ export const updateRole = async (userId, role) => {
 };
 
 export const refreshToken = async (user) => {
-  const { email, username } = user;
-  const token = jwt.sign({ email }, JWT_SECRET, { expiresIn: "24h" });
+  const { email, username, id } = user;
+  const token = jwt.sign({ id }, JWT_SECRET, { expiresIn: "24h" });
   user.token = token;
   await user.save();
 
